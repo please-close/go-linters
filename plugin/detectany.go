@@ -1,12 +1,12 @@
 package main
 
 import (
-	"go-linters/linters/detectany"
+	"github.com/please-close/go-linters/linters/detectany"
 
 	"golang.org/x/tools/go/analysis"
 )
 
-// golint:ignore:detectany
+// nolint:detectany
 func New(conf any) ([]*analysis.Analyzer, error) {
 	return []*analysis.Analyzer{detectany.Analyzer}, nil
 }

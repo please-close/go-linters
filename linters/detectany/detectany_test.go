@@ -3,7 +3,7 @@ package detectany_test
 import (
 	"testing"
 
-	"go-linters/linters/detectany"
+	"github.com/please-close/go-linters/linters/detectany"
 
 	"golang.org/x/tools/go/analysis/analysistest"
 )

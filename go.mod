@@ -1,4 +1,4 @@
-module go-linters
+module github.com/please-close/go-linters
 
 go 1.22.4
 
