@@ -15,41 +15,17 @@ var Analyzer = &analysis.Analyzer{
 
 func run(pass *analysis.Pass) (interface{}, error) {
 	inspect := func(n ast.Node) bool {
-		// 检测结构体类型声明中的 any
+		// 重置类型中的泛型
 		if typeSpec, ok := n.(*ast.TypeSpec); ok {
-			// if strcutType, ok := typeSpec.Type.(*ast.StructType); ok {
-			// 	for _, field := range strcutType.Fields.List {
-			// 		if ident, ok := field.Type.(*ast.Ident); ok && ident.Name == "any" {
-			// 			if ignoreAnyLint(field.Doc) {
-			// 				continue
-			// 			}
-			// 			pass.Reportf(ident.Pos(), "no declaration of \"any\" type")
-			// 		}
-			// 	}
-			// }
-			checkAnyType(typeSpec.Type, pass)
+			typeSpec.TypeParams = nil
 		}
-		// 检测函数参数/返回值中的 any
-		if funcDecl, ok := n.(*ast.FuncDecl); ok {
-			if ignoreAnyLint(funcDecl.Doc) {
-				return true
-			}
-			if funcDecl.Type.Params != nil {
-				for _, field := range funcDecl.Type.Params.List {
-					// if ident, ok := field.Type.(*ast.Ident); ok && ident.Name == "any" {
-					// 	pass.Reportf(ident.Pos(), "no declaration of \"any\" type")
-					// }
-					checkAnyType(field.Type, pass)
-				}
-			}
-			if funcDecl.Type.Results != nil {
-				for _, field := range funcDecl.Type.Results.List {
-					// if ident, ok := field.Type.(*ast.Ident); ok && ident.Name == "any" {
-					// 	pass.Reportf(ident.Pos(), "no declaration of \"any\" type")
-					// }
-					checkAnyType(field.Type, pass)
-				}
-			}
+		// 重置函数泛型
+		if funcType, ok := n.(*ast.FuncType); ok {
+			funcType.TypeParams = nil
+		}
+
+		if ident, ok := n.(*ast.Ident); ok && ident.Name == "any" {
+			pass.Reportf(ident.Pos(), "no declaration of \"any\" type")
 		}
 
 		return true
@@ -65,9 +41,7 @@ func checkAnyType(t ast.Expr, pass *analysis.Pass) {
 	switch v := t.(type) {
 	case *ast.Ident:
 		if v.Name == "any" {
-			if !ignoreAnyLint(v.Obj.Decl.(*ast.TypeSpec).Doc) {
-				pass.Reportf(t.Pos(), "no declaration of \"any\" type")
-			}
+			pass.Reportf(t.Pos(), "no declaration of \"any\" type")
 		}
 	case *ast.StarExpr:
 		checkAnyType(v.X, pass)
@@ -76,12 +50,20 @@ func checkAnyType(t ast.Expr, pass *analysis.Pass) {
 	case *ast.MapType:
 		checkAnyType(v.Key, pass)
 		checkAnyType(v.Value, pass)
-	case *ast.ChanType:
-		checkAnyType(v.Value, pass)
 	case *ast.StructType:
 		for _, field := range v.Fields.List {
-			checkAnyType(field.Type, pass)
+			if !ignoreAnyLint(field.Doc) {
+				checkAnyType(field.Type, pass)
+			}
 		}
+	case *ast.IndexExpr:
+		checkAnyType(v.Index, pass)
+	case *ast.IndexListExpr:
+		for _, indice := range v.Indices {
+			checkAnyType(indice, pass)
+		}
+	case *ast.TypeAssertExpr:
+		checkAnyType(v.Type, pass)
 	default:
 		//
 	}
