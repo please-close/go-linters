@@ -10,7 +10,7 @@ type TestStruct[T any] struct {
 type TestInterface interface {
 }
 
-// nolint:detectany
+//nolint:detectany
 func TestFunc[T any](t TestStruct[T], a TestStruct[any]) {
 	// do nothing
 	var anyMap map[any]any

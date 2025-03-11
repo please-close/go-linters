@@ -8,9 +8,4 @@ linters-settings:
 linters:
   disable-all: true
   enable:
-    - govet:
-        check-shadowing: true
-        settings:
-          printf:
-            funcs:
-              - any # 检测 any 关键字
+    - detectany
