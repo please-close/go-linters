@@ -1,11 +1,16 @@
 # lang: yaml
-linters-settings:
-  custom:
-    detectany:
-      description: "custom linter: detect any"
-      path: "detectany.so"  # 构建后的 linter 可执行文件路径
+
+run:
+  allow-parallel-runners: true
+  timeout: 180s
 
 linters:
   disable-all: true
   enable:
     - detectany
+
+linters-settings:
+  custom:
+    detectany:
+      type: "module"
+

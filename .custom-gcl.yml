@@ -1,8 +1,8 @@
-version: v1.62.2
+version: v1.64.6
 
-destination: ./linters/detectany
+destination: ./
 
 plugins:
   - module: 'github.com/please-close/go-linters'
     import: 'github.com/please-close/go-linters/linters/detectany'
-    path: ./linters/detectany
+    path: ./
